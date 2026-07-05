@@ -24,15 +24,21 @@ const RIGHT_FLIPPER_PIVOT = { x: W - LAUNCH_WIDTH - 20 - 90, y: H - 70 };
 
 // Bumpers (pop bumpers)
 const BUMPERS = [
-    { x: 130, y: 200, r: 26, points: 100, color: "#ff2fbf" },
-    { x: 275, y: 170, r: 26, points: 100, color: "#00dcff" },
-    { x: 200, y: 300, r: 26, points: 150, color: "#ffd600" },
+    { x: 130, y: 210, r: 26, points: 100, color: "#ff2fbf" },
+    { x: 270, y: 175, r: 26, points: 100, color: "#00dcff" },
+    { x: 200, y: 280, r: 32, points: 150, color: "#ffd600" },
+    { x: 370, y: 220, r: 24, points: 100, color: "#b06bff" },
+    { x: 100, y: 300, r: 20, points: 75, color: "#6bff9d" },
+    { x: 340, y: 300, r: 20, points: 75, color: "#ff6b9d" },
 ];
 
 // Small bumpers
 const MINI_BUMPERS = [
-    { x: 85, y: 380, r: 16, points: 50, color: "#b06bff" },
-    { x: 335, y: 380, r: 16, points: 50, color: "#6bff9d" },
+    { x: 85, y: 400, r: 16, points: 50, color: "#6bff9d" },
+    { x: 335, y: 400, r: 16, points: 50, color: "#ff6b9d" },
+    { x: 60, y: 200, r: 14, points: 50, color: "#6be7ff" },
+    { x: 420, y: 155, r: 14, points: 75, color: "#ffab6b" },
+    { x: 200, y: 130, r: 14, points: 75, color: "#ffd6f9" },
 ];
 
 // Slingshots
@@ -518,10 +524,10 @@ export default function Pinball() {
             if (status === "playing") {
                 if (ball.onLaunch) {
                     if (keysRef.current.launch) {
-                        s.plungerPower = Math.min(s.plungerPower + 0.5, 26);
+                        s.plungerPower = Math.min(s.plungerPower + 0.4, 20);
                     } else if (s.plungerPower > 0) {
                         ball.vy = -s.plungerPower;
-                        ball.vx = -0.6;
+                        ball.vx = -0.4;
                         sweep(
                             150 + s.plungerPower * 30,
                             800,
@@ -1125,24 +1131,25 @@ export default function Pinball() {
                 const pulse = 0.5 + 0.5 * Math.sin(s.frame * 0.1);
                 ctx.font = "bold 11px 'Press Start 2P', monospace";
                 ctx.fillStyle = `rgba(255, 214, 0, ${0.6 + pulse * 0.4})`;
-                ctx.textAlign = "center";
+                ctx.textAlign = "right";
                 ctx.textBaseline = "middle";
                 ctx.shadowBlur = 8;
                 ctx.shadowColor = "#ffd600";
-                ctx.fillText("SEGURE", ball.x, ball.y - 30);
-                ctx.fillText("ESPACO", ball.x, ball.y - 15);
+                // Draw hint to the LEFT of the ball (avoids canvas clipping)
+                ctx.fillText("SEGURE", ball.x - 30, ball.y - 12);
+                ctx.fillText("ESPACO", ball.x - 30, ball.y + 4);
                 ctx.shadowBlur = 0;
-                // arrow pointing at ball
+                // arrow pointing at ball (from left)
                 ctx.strokeStyle = `rgba(255, 214, 0, ${0.6 + pulse * 0.4})`;
                 ctx.lineWidth = 2;
                 ctx.beginPath();
-                ctx.moveTo(ball.x - 25, ball.y);
-                ctx.lineTo(ball.x - 15, ball.y);
+                ctx.moveTo(ball.x - 28, ball.y + 20);
+                ctx.lineTo(ball.x - 18, ball.y + 20);
                 ctx.stroke();
                 ctx.beginPath();
-                ctx.moveTo(ball.x - 20, ball.y - 4);
-                ctx.lineTo(ball.x - 15, ball.y);
-                ctx.lineTo(ball.x - 20, ball.y + 4);
+                ctx.moveTo(ball.x - 22, ball.y + 16);
+                ctx.lineTo(ball.x - 18, ball.y + 20);
+                ctx.lineTo(ball.x - 22, ball.y + 24);
                 ctx.stroke();
             }
 
