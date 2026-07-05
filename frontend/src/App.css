@@ -1,0 +1,420 @@
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap");
+
+.App {
+    min-height: 100vh;
+    background: #05010e;
+    color: #f4f4ff;
+    font-family: "VT323", monospace;
+    overflow: hidden;
+}
+
+.pinball-shell {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background:
+        radial-gradient(
+            circle at 20% 10%,
+            rgba(255, 0, 170, 0.18),
+            transparent 40%
+        ),
+        radial-gradient(
+            circle at 80% 90%,
+            rgba(0, 200, 255, 0.18),
+            transparent 45%
+        ),
+        radial-gradient(
+            circle at 50% 50%,
+            rgba(255, 220, 0, 0.06),
+            transparent 60%
+        ),
+        #05010e;
+}
+
+.pinball-shell::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(
+            rgba(255, 255, 255, 0.03) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.03) 1px,
+            transparent 1px
+        );
+    background-size: 40px 40px;
+    pointer-events: none;
+}
+
+.pinball-shell::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.15) 0px,
+        rgba(0, 0, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 3px
+    );
+    pointer-events: none;
+    mix-blend-mode: overlay;
+}
+
+.pinball-cabinet {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 28px;
+    align-items: center;
+    z-index: 2;
+}
+
+.side-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 220px;
+}
+
+.side-panel.left {
+    align-items: flex-end;
+    text-align: right;
+}
+
+.arcade-title {
+    font-family: "Press Start 2P", monospace;
+    font-size: 22px;
+    line-height: 1.5;
+    letter-spacing: 2px;
+    color: #fff9c4;
+    text-shadow:
+        0 0 4px #ff2fbf,
+        0 0 12px #ff2fbf,
+        0 0 24px #6b00ff;
+}
+
+.arcade-sub {
+    font-family: "VT323", monospace;
+    font-size: 22px;
+    color: #6be7ff;
+    letter-spacing: 3px;
+    text-shadow: 0 0 8px rgba(0, 200, 255, 0.6);
+}
+
+.hud-card {
+    border: 2px solid rgba(255, 47, 191, 0.6);
+    background: rgba(20, 3, 40, 0.7);
+    padding: 16px 20px;
+    box-shadow:
+        0 0 12px rgba(255, 47, 191, 0.35),
+        inset 0 0 24px rgba(255, 47, 191, 0.08);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.hud-card.cyan {
+    border-color: rgba(0, 220, 255, 0.6);
+    box-shadow:
+        0 0 12px rgba(0, 220, 255, 0.35),
+        inset 0 0 24px rgba(0, 220, 255, 0.08);
+}
+
+.hud-card.yellow {
+    border-color: rgba(255, 214, 0, 0.7);
+    box-shadow:
+        0 0 12px rgba(255, 214, 0, 0.35),
+        inset 0 0 24px rgba(255, 214, 0, 0.08);
+}
+
+.hud-label {
+    font-family: "Press Start 2P", monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: #ffd6f9;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.hud-value {
+    font-family: "Press Start 2P", monospace;
+    font-size: 26px;
+    color: #ffffff;
+    text-shadow:
+        0 0 6px #ff2fbf,
+        0 0 18px #ff2fbf;
+    word-break: break-all;
+}
+
+.hud-value.cyan {
+    text-shadow:
+        0 0 6px #00dcff,
+        0 0 18px #00dcff;
+}
+
+.hud-value.yellow {
+    text-shadow:
+        0 0 6px #ffd600,
+        0 0 18px #ffd600;
+}
+
+.balls-row {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.side-panel.right .balls-row {
+    justify-content: flex-start;
+}
+
+.ball-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #fff, #b8b8ff 60%, #4b3fff);
+    box-shadow: 0 0 10px rgba(120, 200, 255, 0.9);
+}
+
+.ball-dot.spent {
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: none;
+    border: 1px dashed rgba(255, 255, 255, 0.25);
+}
+
+.instructions {
+    font-family: "VT323", monospace;
+    font-size: 20px;
+    color: #d7c8ff;
+    line-height: 1.5;
+    letter-spacing: 1px;
+}
+
+.instructions .key {
+    display: inline-block;
+    padding: 2px 8px;
+    margin: 0 2px;
+    border: 1px solid #6be7ff;
+    color: #6be7ff;
+    font-family: "Press Start 2P", monospace;
+    font-size: 10px;
+    border-radius: 4px;
+    box-shadow: 0 0 6px rgba(0, 220, 255, 0.4);
+}
+
+.table-wrap {
+    position: relative;
+    padding: 14px;
+    border-radius: 24px;
+    background: linear-gradient(180deg, #1c0537 0%, #08011a 100%);
+    border: 3px solid #ff2fbf;
+    box-shadow:
+        0 0 40px rgba(255, 47, 191, 0.5),
+        inset 0 0 60px rgba(107, 231, 255, 0.15),
+        0 40px 100px rgba(0, 0, 0, 0.7);
+}
+
+.table-wrap::before {
+    content: "";
+    position: absolute;
+    inset: -8px;
+    border-radius: 28px;
+    border: 2px solid rgba(107, 231, 255, 0.4);
+    pointer-events: none;
+}
+
+.pinball-canvas {
+    display: block;
+    border-radius: 14px;
+    background: #030014;
+    box-shadow:
+        inset 0 0 30px rgba(255, 47, 191, 0.3),
+        inset 0 0 80px rgba(0, 0, 0, 0.7);
+}
+
+.marquee {
+    position: absolute;
+    top: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #0a0018;
+    padding: 4px 18px;
+    border: 2px solid #ffd600;
+    color: #ffd600;
+    font-family: "Press Start 2P", monospace;
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-shadow: 0 0 8px #ffd600;
+    box-shadow: 0 0 12px rgba(255, 214, 0, 0.5);
+    white-space: nowrap;
+}
+
+.overlay {
+    position: absolute;
+    inset: 14px;
+    border-radius: 14px;
+    background: rgba(3, 0, 20, 0.86);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+    gap: 18px;
+    backdrop-filter: blur(4px);
+}
+
+.overlay-title {
+    font-family: "Press Start 2P", monospace;
+    font-size: 36px;
+    color: #fff;
+    text-shadow:
+        0 0 8px #ff2fbf,
+        0 0 24px #ff2fbf,
+        0 0 40px #6b00ff;
+    letter-spacing: 4px;
+}
+
+.overlay-title.small {
+    font-size: 24px;
+}
+
+.overlay-sub {
+    font-family: "VT323", monospace;
+    font-size: 26px;
+    color: #6be7ff;
+    letter-spacing: 2px;
+    text-shadow: 0 0 8px rgba(0, 220, 255, 0.7);
+}
+
+.arcade-btn {
+    font-family: "Press Start 2P", monospace;
+    font-size: 14px;
+    padding: 16px 28px;
+    background: linear-gradient(180deg, #ff2fbf 0%, #a80090 100%);
+    color: #fff;
+    border: 2px solid #fff9c4;
+    letter-spacing: 3px;
+    cursor: pointer;
+    box-shadow:
+        0 0 16px rgba(255, 47, 191, 0.7),
+        0 6px 0 #4a003a;
+    transition: transform 0.08s ease, box-shadow 0.15s ease;
+}
+
+.arcade-btn:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 0 24px rgba(255, 47, 191, 0.9),
+        0 8px 0 #4a003a;
+}
+
+.arcade-btn:active {
+    transform: translateY(4px);
+    box-shadow:
+        0 0 12px rgba(255, 47, 191, 0.6),
+        0 2px 0 #4a003a;
+}
+
+.arcade-btn.cyan {
+    background: linear-gradient(180deg, #00dcff 0%, #007a9a 100%);
+    box-shadow:
+        0 0 16px rgba(0, 220, 255, 0.7),
+        0 6px 0 #003c4a;
+}
+
+.hint-tag {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: "VT323", monospace;
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 2px;
+}
+
+.blink {
+    animation: blink 1s steps(2, start) infinite;
+}
+
+@keyframes blink {
+    to {
+        visibility: hidden;
+    }
+}
+
+.mobile-controls {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    padding: 0 20px;
+    justify-content: space-between;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.mobile-btn {
+    pointer-events: auto;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: rgba(255, 47, 191, 0.3);
+    border: 2px solid #ff2fbf;
+    color: #fff;
+    font-family: "Press Start 2P", monospace;
+    font-size: 20px;
+    box-shadow: 0 0 20px rgba(255, 47, 191, 0.6);
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+}
+
+.mobile-btn.cyan {
+    background: rgba(0, 220, 255, 0.3);
+    border-color: #00dcff;
+    box-shadow: 0 0 20px rgba(0, 220, 255, 0.6);
+}
+
+.mobile-btn:active {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+@media (max-width: 900px) {
+    .pinball-cabinet {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    .side-panel {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        min-width: 0;
+        gap: 10px;
+    }
+    .side-panel.left,
+    .side-panel.right {
+        align-items: center;
+        text-align: center;
+    }
+    .arcade-title {
+        font-size: 16px;
+    }
+    .hud-value {
+        font-size: 18px;
+    }
+    .mobile-controls {
+        display: flex;
+    }
+    .pinball-shell {
+        padding: 12px;
+    }
+}
