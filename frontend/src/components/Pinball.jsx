@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 // ---- Table constants ---------------------------------------------------
 const W = 480;
 const H = 760;
-const BALL_R = 10;
+const BALL_R = 12;
 const GRAVITY = 0.28;
 const FRICTION = 0.999;
 const MAX_SPEED = 30;
@@ -364,12 +364,13 @@ export default function Pinball() {
         stateRef.current = {
             ball: {
                 x: LAUNCH_X,
-                y: H - 30,
+                y: H - 40,
                 vx: 0,
                 vy: 0,
                 onLaunch: true,
-                prevY: H - 30,
+                prevY: H - 40,
             },
+            ballTrail: [],
             leftAngle: FLIPPER_REST_ANGLE,
             rightAngle: FLIPPER_REST_ANGLE,
             leftAngleTarget: FLIPPER_REST_ANGLE,
@@ -398,12 +399,13 @@ export default function Pinball() {
         if (!stateRef.current) initState();
         stateRef.current.ball = {
             x: LAUNCH_X,
-            y: H - 30,
+            y: H - 40,
             vx: 0,
             vy: 0,
             onLaunch: true,
-            prevY: H - 30,
+            prevY: H - 40,
         };
+        stateRef.current.ballTrail = [];
         stateRef.current.plungerPower = 0;
     }, [initState]);
 
@@ -786,6 +788,15 @@ export default function Pinball() {
             s.targetFlash = s.targetFlash.map((v) => Math.max(0, v - 1));
             s.laneFlash = s.laneFlash.map((v) => Math.max(0, v - 1));
 
+            // Update ball trail
+            if (!ball.onLaunch && (Math.abs(ball.vx) > 1 || Math.abs(ball.vy) > 1)) {
+                if (!s.ballTrail) s.ballTrail = [];
+                s.ballTrail.push({ x: ball.x, y: ball.y });
+                if (s.ballTrail.length > 8) s.ballTrail.shift();
+            } else {
+                s.ballTrail = [];
+            }
+
             s.particles = s.particles
                 .map((p) => ({
                     ...p,
@@ -1057,25 +1068,83 @@ export default function Pinball() {
             }
             ctx.globalAlpha = 1;
 
+            // Ball trail
+            if (s.ballTrail && s.ballTrail.length > 0) {
+                for (let i = 0; i < s.ballTrail.length; i++) {
+                    const t = s.ballTrail[i];
+                    const alpha = ((i + 1) / s.ballTrail.length) * 0.5;
+                    ctx.globalAlpha = alpha;
+                    ctx.beginPath();
+                    ctx.arc(t.x, t.y, BALL_R * (0.4 + 0.6 * (i / s.ballTrail.length)), 0, Math.PI * 2);
+                    ctx.fillStyle = "#a0c8ff";
+                    ctx.fill();
+                }
+                ctx.globalAlpha = 1;
+            }
+
             // Ball
+            // Outer glow
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, BALL_R + 8, 0, Math.PI * 2);
+            const glowGrad = ctx.createRadialGradient(
+                ball.x, ball.y, BALL_R,
+                ball.x, ball.y, BALL_R + 8,
+            );
+            glowGrad.addColorStop(0, "rgba(160, 200, 255, 0.6)");
+            glowGrad.addColorStop(1, "rgba(160, 200, 255, 0)");
+            ctx.fillStyle = glowGrad;
+            ctx.fill();
+            // Ball body
             const ballGrad = ctx.createRadialGradient(
-                ball.x - 3,
-                ball.y - 3,
+                ball.x - 4,
+                ball.y - 4,
                 1,
                 ball.x,
                 ball.y,
                 BALL_R,
             );
             ballGrad.addColorStop(0, "#ffffff");
-            ballGrad.addColorStop(0.5, "#d0d8ff");
-            ballGrad.addColorStop(1, "#4030a0");
+            ballGrad.addColorStop(0.4, "#e8ecff");
+            ballGrad.addColorStop(1, "#6060c0");
             ctx.beginPath();
             ctx.arc(ball.x, ball.y, BALL_R, 0, Math.PI * 2);
             ctx.fillStyle = ballGrad;
-            ctx.shadowBlur = 20;
+            ctx.shadowBlur = 25;
             ctx.shadowColor = "#a0c8ff";
             ctx.fill();
             ctx.shadowBlur = 0;
+            // Ball outline
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, BALL_R, 0, Math.PI * 2);
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // "READY - PRESS SPACE" hint when ball on launcher
+            if (status === "playing" && ball.onLaunch && s.plungerPower === 0) {
+                const pulse = 0.5 + 0.5 * Math.sin(s.frame * 0.1);
+                ctx.font = "bold 11px 'Press Start 2P', monospace";
+                ctx.fillStyle = `rgba(255, 214, 0, ${0.6 + pulse * 0.4})`;
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = "#ffd600";
+                ctx.fillText("SEGURE", ball.x, ball.y - 30);
+                ctx.fillText("ESPACO", ball.x, ball.y - 15);
+                ctx.shadowBlur = 0;
+                // arrow pointing at ball
+                ctx.strokeStyle = `rgba(255, 214, 0, ${0.6 + pulse * 0.4})`;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(ball.x - 25, ball.y);
+                ctx.lineTo(ball.x - 15, ball.y);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(ball.x - 20, ball.y - 4);
+                ctx.lineTo(ball.x - 15, ball.y);
+                ctx.lineTo(ball.x - 20, ball.y + 4);
+                ctx.stroke();
+            }
 
             rafRef.current = requestAnimationFrame(step);
         };
@@ -1338,7 +1407,7 @@ export default function Pinball() {
                     ◀
                 </button>
                 <button
-                    className="mobile-btn"
+                    className="mobile-btn launch-btn"
                     data-testid="mobile-launch"
                     onTouchStart={touchLaunch(true)}
                     onTouchEnd={touchLaunch(false)}
@@ -1346,7 +1415,7 @@ export default function Pinball() {
                     onMouseUp={touchLaunch(false)}
                     onMouseLeave={touchLaunch(false)}
                 >
-                    ▲
+                    LANÇAR
                 </button>
                 <button
                     className="mobile-btn"

@@ -391,41 +391,73 @@
 }
 
 .mobile-controls {
-    display: none;
+    display: flex;
     position: fixed;
     bottom: 20px;
-    left: 0;
-    right: 0;
-    padding: 0 20px;
-    justify-content: space-between;
+    left: 50%;
+    transform: translateX(-50%);
+    gap: 16px;
     z-index: 10;
     pointer-events: none;
 }
 
 .mobile-btn {
     pointer-events: auto;
-    width: 90px;
-    height: 90px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
-    background: rgba(255, 47, 191, 0.3);
-    border: 2px solid #ff2fbf;
-    color: #fff;
+    background: rgba(0, 220, 255, 0.25);
+    border: 3px solid #00dcff;
+    color: #ffffff;
     font-family: "Press Start 2P", monospace;
-    font-size: 20px;
-    box-shadow: 0 0 20px rgba(255, 47, 191, 0.6);
+    font-size: 18px;
+    box-shadow: 0 0 25px rgba(0, 220, 255, 0.7);
     user-select: none;
     -webkit-user-select: none;
     touch-action: manipulation;
+    cursor: pointer;
+    transition: transform 0.08s ease;
+}
+
+.mobile-btn:hover {
+    transform: scale(1.05);
+}
+
+.mobile-btn:active,
+.mobile-btn:focus {
+    background: rgba(255, 255, 255, 0.4);
+    outline: none;
 }
 
 .mobile-btn.cyan {
-    background: rgba(0, 220, 255, 0.3);
+    background: rgba(0, 220, 255, 0.25);
     border-color: #00dcff;
-    box-shadow: 0 0 20px rgba(0, 220, 255, 0.6);
+    box-shadow: 0 0 25px rgba(0, 220, 255, 0.7);
 }
 
-.mobile-btn:active {
-    background: rgba(255, 255, 255, 0.4);
+.mobile-btn.launch-btn {
+    width: 130px;
+    height: 80px;
+    border-radius: 40px;
+    background: linear-gradient(180deg, #ffd600, #b09500);
+    border: 3px solid #ffffff;
+    color: #1a0033;
+    font-size: 14px;
+    letter-spacing: 2px;
+    box-shadow: 0 0 30px rgba(255, 214, 0, 0.8);
+    animation: launch-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes launch-pulse {
+    0%,
+    100% {
+        box-shadow: 0 0 25px rgba(255, 214, 0, 0.7);
+    }
+    50% {
+        box-shadow:
+            0 0 45px rgba(255, 214, 0, 1),
+            0 0 60px rgba(255, 214, 0, 0.5);
+    }
 }
 
 @media (max-width: 900px) {
