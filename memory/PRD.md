@@ -17,15 +17,25 @@
 
 ## What's been implemented (2026-02-05)
 - `/app/frontend/src/components/Pinball.jsx` — jogo completo em HTML5 Canvas + React
-  - Física: gravidade, atrito, sub-step integration, colisão segmento/círculo/triângulo
-  - 5 bumpers com pontuações (75/100/150), 2 slingshots triangulares
-  - 2 palhetas com física de rotação e boost de velocidade
-  - Plunger com power meter visual, chute lateral com deflector
-  - Sistema de combo, partículas de impacto, flashes visuais
+  - Física: gravidade, atrito, sub-step integration, colisão segmento/círculo/triângulo/retângulo
+  - 3 bumpers grandes (100-150 pts) e 2 bumpers pequenos (50 pts)
+  - 2 slingshots triangulares (25 pts)
+  - **4 corredores (rollover lanes) no topo** — passar acende luz, 4 completos = +1500 bônus
+  - **5 alvos derrubáveis (drop targets)** — cada um 250 pts, todos derrubados = +2000 bônus
+  - **Spinner giratório** no centro (10 pts por passagem)
+  - Guias/paredes internas no topo para direcionar a bolinha
+  - Chute do lançador totalmente fechado com defletor superior
+  - Plunger com power meter visual (força carregável)
+  - Sistema de combo com timer
+  - Partículas de impacto e flash visual nos alvos
+  - **Sons sintetizados via Web Audio API**:
+    - Bumper hit, drop target, slingshot, wall bump (sub-som), flipper, launch (sweep), drain (sweep down), lane rollover, bonus fanfare
+    - Toggle mute com tecla M ou botão SOM ON/OFF
+  - HUD lateral com Score, High Score, Combo, Bolas, Corredores acesos, Alvos remanescentes
   - Localstorage para high score
   - Controles touch para mobile
-- `/app/frontend/src/App.js` — roteamento simplificado, renderiza `<Pinball />` na raiz
-- `/app/frontend/src/App.css` — estilo arcade neon: gabinete de fliperama com marquee, painéis HUD, botões arcade, animação blink
+- `/app/frontend/src/App.js` — roteamento simplificado
+- `/app/frontend/src/App.css` — estilo arcade neon com sonoro toggle, lane lights indicators
 
 ## Prioritized Backlog
 ### P1
