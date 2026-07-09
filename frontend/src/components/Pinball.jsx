@@ -4,11 +4,11 @@ import { useEffect, useRef, useState, useCallback } from "react";
 const W = 480;
 const H = 760;
 const BALL_R = 12;
-const GRAVITY = 0.28;
+const GRAVITY = 0.22;
 const FRICTION = 0.999;
 const MAX_SPEED = 30;
 
-const LAUNCH_WIDTH = 34;
+const LAUNCH_WIDTH = 43;
 const LAUNCH_WALL_X = W - LAUNCH_WIDTH - 4;
 const LAUNCH_X = LAUNCH_WALL_X + LAUNCH_WIDTH / 2 + 2;
 

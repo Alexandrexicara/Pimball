@@ -1,7 +1,7 @@
 from fastapi import FastAPI, APIRouter
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
-from motor.motor_asyncio import AsyncIOMotorClient
+import asyncpg
 import os
 import logging
 from pathlib import Path
@@ -14,10 +14,15 @@ from datetime import datetime, timezone
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+# PostgreSQL connection
+DATABASE_URL = os.environ.get('DATABASE_URL', 'postgresql://postgres:celio48@localhost:5432/pinball')
+pool = None
+
+async def get_db_pool():
+    global pool
+    if pool is None:
+        pool = await asyncpg.create_pool(DATABASE_URL)
+    return pool
 
 # Create the main app without a prefix
 app = FastAPI()
@@ -44,25 +49,33 @@ async def root():
 
 @api_router.post("/status", response_model=StatusCheck)
 async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.model_dump()
-    status_obj = StatusCheck(**status_dict)
+    db_pool = await get_db_pool()
+    status_obj = StatusCheck(**input.model_dump())
     
-    # Convert to dict and serialize datetime to ISO string for MongoDB
-    doc = status_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
+    async with db_pool.acquire() as conn:
+        await conn.execute(
+            '''INSERT INTO status_checks (id, client_name, timestamp) 
+               VALUES ($1, $2, $3)''',
+            status_obj.id, status_obj.client_name, status_obj.timestamp
+        )
     
-    _ = await db.status_checks.insert_one(doc)
     return status_obj
 
 @api_router.get("/status", response_model=List[StatusCheck])
 async def get_status_checks():
-    # Exclude MongoDB's _id field from the query results
-    status_checks = await db.status_checks.find({}, {"_id": 0}).to_list(1000)
+    db_pool = await get_db_pool()
     
-    # Convert ISO string timestamps back to datetime objects
-    for check in status_checks:
-        if isinstance(check['timestamp'], str):
-            check['timestamp'] = datetime.fromisoformat(check['timestamp'])
+    async with db_pool.acquire() as conn:
+        rows = await conn.fetch('SELECT id, client_name, timestamp FROM status_checks')
+    
+    status_checks = [
+        StatusCheck(
+            id=row['id'],
+            client_name=row['client_name'],
+            timestamp=row['timestamp']
+        )
+        for row in rows
+    ]
     
     return status_checks
 
@@ -85,5 +98,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 @app.on_event("shutdown")
-async def shutdown_db_client():
-    client.close()
+async def shutdown_db_pool():
+    global pool
+    if pool:
+        await pool.close()
