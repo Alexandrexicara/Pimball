@@ -361,6 +361,23 @@ export default function Pinball() {
         soundEnabledRef.current = soundOn;
     }, [soundOn]);
 
+    // Initialize Minigame SDK
+    useEffect(() => {
+        if (typeof window !== "undefined" && window.MiniGameSDK) {
+            window.MiniGameSDK.init(() => {
+                console.log("Minigame SDK initialized");
+                window.MiniGameSDK.setGameReadyAsync();
+            });
+
+            window.MiniGameSDK.pauseSound = () => {
+                soundEnabledRef.current = false;
+            };
+            window.MiniGameSDK.resumeSound = () => {
+                soundEnabledRef.current = soundOn;
+            };
+        }
+    }, [soundOn]);
+
     useEffect(() => {
         const b = parseInt(localStorage.getItem("pinball_best") || "0", 10);
         setBest(Number.isFinite(b) ? b : 0);
@@ -427,6 +444,11 @@ export default function Pinball() {
         setTargetsUp([true, true, true, true, true]);
         setStatus("playing");
         sweep(200, 800, 0.3, "sawtooth", 0.12);
+
+        // Show banner ad when game starts
+        if (typeof window !== "undefined" && window.MiniGameSDK) {
+            window.MiniGameSDK.showBanner();
+        }
     }, [initState]);
 
     // Keyboard
@@ -778,6 +800,16 @@ export default function Pinball() {
                                         sweep(300, 80, 1.0, "square", 0.12),
                                     400,
                                 );
+
+                                // Hide banner and show interstitial ad on game over
+                                if (typeof window !== "undefined" && window.MiniGameSDK) {
+                                    window.MiniGameSDK.hideBanner();
+                                    setTimeout(() => {
+                                        window.MiniGameSDK.showInterstitial((result) => {
+                                            console.log("Interstitial ad result:", result);
+                                        });
+                                    }, 1000);
+                                }
                             } else {
                                 setMessage("BOLA PERDIDA!");
                                 setTimeout(() => setMessage(""), 1400);
